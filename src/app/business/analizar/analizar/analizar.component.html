@@ -1,0 +1,95 @@
+<div class="container">
+  <div class="card">
+    <header class="card-header">
+      <h1 class="title">🎓 Predicción de Deserción Estudiantil</h1>
+      <p class="subtitle">Ingresa los datos para evaluar el riesgo de deserción.</p>
+    </header>
+
+    <!-- Mensaje de error si ocurre -->
+    <div *ngIf="errorMessage" class="message error-message">
+      <p><strong>Error:</strong> {{ errorMessage }}</p>
+    </div>
+
+    <!-- Formulario: se muestra cuando ya cargó la metadata -->
+    <form *ngIf="predictionForm" [formGroup]="predictionForm" (ngSubmit)="onSubmit()">
+
+      <!-- Sección: Datos Académicos y Financieros -->
+      <div *ngIf="numericalFeatures.length > 0">
+        <h2 class="section-title">📊 Datos Académicos y Financieros</h2>
+        <div class="form-grid">
+          <div class="form-group" *ngFor="let feature of numericalFeatures">
+            <label [for]="feature.sanitizedName">{{ feature.name }}:</label>
+            <input
+              [id]="feature.sanitizedName"
+              [type]="feature.name.includes('Porcentaje') ? 'range' : 'number'"
+              [min]="feature.name.includes('Porcentaje') ? 0 : null"
+              [max]="feature.name.includes('Porcentaje') ? 100 : null"
+              [step]="feature.name.includes('Porcentaje') ? 0.1 : 'any'"
+              [formControlName]="feature.sanitizedName"
+              class="input-field">
+
+            <span *ngIf="feature.name.includes('Porcentaje')" class="range-value">
+              {{ predictionForm.get(feature.sanitizedName)?.value }}%
+            </span>
+
+            <small
+              *ngIf="predictionForm.get(feature.sanitizedName)?.hasError('required') && predictionForm.get(feature.sanitizedName)?.touched"
+              class="text-danger">
+              Este campo es requerido.
+            </small>
+          </div>
+        </div>
+        <hr class="divider">
+      </div>
+
+      <!-- Sección: Datos Personales y de Contexto -->
+      <h2 class="section-title">👤 Datos Personales y de Contexto</h2>
+      <div class="form-grid">
+        <div class="form-group" *ngFor="let feature of categoricalFeatures">
+          <label [for]="feature.sanitizedName">{{ feature.name }}:</label>
+          <select [id]="feature.sanitizedName" [formControlName]="feature.sanitizedName" class="select-field">
+            <option *ngFor="let val of feature.allowed_values" [value]="val">
+              {{ val }}
+            </option>
+          </select>
+          <small
+            *ngIf="predictionForm.get(feature.sanitizedName)?.hasError('required') && predictionForm.get(feature.sanitizedName)?.touched"
+            class="text-danger">
+            Este campo es requerido.
+          </small>
+        </div>
+      </div>
+
+      <!-- Botón de predicción -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading">
+          <span *ngIf="!isLoading">🔮 Predecir Deserción</span>
+          <span *ngIf="isLoading">⏳ Analizando...</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Mensaje de carga inicial (solo mientras carga metadata) -->
+    <div *ngIf="!predictionForm && !errorMessage" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando formulario...</p>
+    </div>
+
+    <!-- Resultado de la predicción -->
+    <div *ngIf="predictionResult" class="card-footer">
+      <hr class="divider">
+      <h2 class="section-title">📊 Resultado de la Predicción</h2>
+      <div class="result-box"
+        [ngClass]="{'desertor': predictionResult.y_pred === 1, 'no-desertor': predictionResult.y_pred === 0}">
+        <p class="result-label">
+          {{ predictionResult.y_pred === 1 ? '⚠️ ALTO RIESGO DE DESERCIÓN' : '✅ BAJO RIESGO DE DESERCIÓN' }}
+        </p>
+        <p><strong>Clase Predicha:</strong> {{ predictionResult.label }}</p>
+        <p><strong>Probabilidad de Desertar:</strong> {{ (predictionResult.prob_deserto * 100).toFixed(2) }}%</p>
+      </div>
+    </div>
+  </div>
+</div>

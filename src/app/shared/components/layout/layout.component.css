@@ -1,0 +1,21 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .layout__content {
+    display: flex;
+    flex: 1;
+  }
+
+  app-side {
+    width: 250px;
+    background-color: #00BFFF; /* celeste */
+  }
+
+  .layout__main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }

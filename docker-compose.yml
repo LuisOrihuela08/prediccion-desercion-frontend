@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  # Backend API (FastAPI/Python)
+  backend:
+    image: luisorihuela92/desercion-api:latest
+    container_name: desercion-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - desercion-network
+    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8000/metadata"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 40s
+
+  # Frontend (Angular + Nginx)
+  frontend:
+    image: luisorihuela92/desercion-frontend:latest
+    container_name: desercion-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - desercion-network
+    restart: unless-stopped
+
+networks:
+  desercion-network:
+    driver: bridge
