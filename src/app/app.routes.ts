@@ -13,6 +13,16 @@ export const routes: Routes = [
       {
         path: 'reportes',
         loadComponent: () => import('./business/reportes/reportes/reportes.component').then(m => m.ReportesComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'analizar',
+        pathMatch: 'full'
+      },
+      {
+        path: '**',
+        redirectTo: 'analizar',
+        pathMatch: 'full'
       }
     ]
   }
