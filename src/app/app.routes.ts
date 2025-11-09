@@ -22,7 +22,6 @@ export const routes: Routes = [
       {
         path: '**',
         redirectTo: 'analizar',
-        pathMatch: 'full'
       }
     ]
   }
